@@ -1,5 +1,3 @@
-""" Convert Geoprecision csv files to different formats """
-
 import re
 
 def FG2_to_GP5W(FG2_file, new_file):
@@ -45,3 +43,39 @@ def FG2_to_GP5W(FG2_file, new_file):
                     # write all data lines
                     else:
                         new.writelines(line)
+                        
+                                        
+if __name__ == "__main__":
+    import argparse
+    import glob
+    import os
+    
+    parser = argparse.ArgumentParser(description="Convert geoprecision csv exports",
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--f',    default=None, type=str, help="single file path to convert")
+    parser.add_argument('--n',    default=None, type=str, help="single file new output")
+    parser.add_argument('--d',    default=None, type=str, help="directory of csv files to convert")
+
+    
+    args = parser.parse_args()
+    
+    # Processing a single file
+    if args.f:    
+        in_file = args.f
+        out_file = args.n
+        FG2_to_GP5W(in_file, out_file)
+        
+        print("Created: {}".format(out_file))
+    
+    # Processing a directory of files
+    if args.d:
+        files = glob.glob(os.path.join(args.d, "*.csv"))
+        
+        for f in files:
+            out_file = re.sub("\\.csv$", "_GP5Wfmt.csv", f)
+            
+            try:
+                FG2_to_GP5W(f, out_file)
+            except:
+                print("could not convert file {}".format(os.path.basename(f)))
+                        
